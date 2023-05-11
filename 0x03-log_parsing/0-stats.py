@@ -1,47 +1,32 @@
 #!/usr/bin/python3
 """ script that reads stdin line by line and computes metrics """
+import sys
 
-if __name__ == '__main__':
+total_file_size = 0
+status_code_counts = {200: 0, 301: 0, 400: 0, 401: 0, 403: 0, 404: 0, 405: 0, 500: 0}
 
-    import sys
+try:
+    for i, line in enumerate(sys.stdin):      
+        parts = line.strip().split()
+        if len(parts) != 7:
+            continue
+       
+        status_code = int(parts[5])
+        file_size = int(parts[6])
+        # Update the counters
+        total_file_size += file_size
+        status_code_counts[status_code] += 1
+        if i > 0 and i % 10 == 0:
+            print(f'Total file size: {total_file_size}')
+            for code in sorted(status_code_counts.keys()):
+                count = status_code_counts[code]
+                if count > 0:
+                    print(f'{code}: {count}')
+            print('')
+except KeyboardInterrupt:
+    print(f'Total file size: {total_file_size}')
+    for code in sorted(status_code_counts.keys()):
+        count = status_code_counts[code]
+        if count > 0:
+            print(f'{code}: {count}')
 
-    def print_results(statusCodes, fileSize):
-        """ Print statistics """
-        print("File size: {:d}".format(fileSize))
-        for statusCode, times in sorted(statusCodes.items()):
-            if times:
-                print("{:s}: {:d}".format(statusCode, times))
-
-    statusCodes = {"200": 0,
-                   "301": 0,
-                   "400": 0,
-                   "401": 0,
-                   "403": 0,
-                   "404": 0,
-                   "405": 0,
-                   "500": 0
-                   }
-    fileSize = 0
-    n_lines = 0
-
-    try:
-        """ Read stdin line by line """
-        for line in sys.stdin:
-            if n_lines != 0 and n_lines % 10 == 0:
-                """ After every 10 lines, print from the beginning """
-                print_results(statusCodes, fileSize)
-            n_lines += 1
-            data = line.split()
-            try:
-                """ Compute metrics """
-                statusCode = data[-2]
-                if statusCode in statusCodes:
-                    statusCodes[statusCode] += 1
-                fileSize += int(data[-1])
-            except:
-                pass
-        print_results(statusCodes, fileSize)
-    except KeyboardInterrupt:
-        """ Keyboard interruption, print from the beginning """
-        print_results(statusCodes, fileSize)
-        raise
