@@ -33,10 +33,15 @@ def validUTF8(data):
             # Check Four Bytes
             elif num >> 3 == 0b11110:
                 remaining_byte = 3
+            # Check if more than 4 Bytes
             else:
                 return False
+        # Other bytes
         else:
-           if num >> 6 != 0b10:
-            return False
-        remaining_byte -= 1
-        return remaining_byte == 0
+            # Check utf-8 other Byte header
+            if num >> 6 != 0b10:
+                return False
+            remaining_byte -= 1
+
+    # Check if all bytes were used
+    return remaining_byte == 0
