@@ -1,35 +1,45 @@
 #!/usr/bin/python3
+"""
+    Script that determines if a given data set represents a valid UTF-8
+    encoding.
+"""
+
+
 def validUTF8(data):
-  """
-  Determines if a given data set represents a valid UTF-8 encoding.
+    """
+        Determines if a given data set represents a valid UTF-8 encoding.
 
-  Args:
-    data: A list of integers representing the data set.
+        Args:
+            data: A list of integers representing a byte sequence
 
-  Returns:
-    True if data is a valid UTF-8 encoding, else False.
-  """
+        Returns:
+            True if the data is a valid UTF-8 encoding, False otherwise
+    """
 
-  # Check if the data set is empty.
-  if not data:
-    return False
+    remaining_byte = 0
 
-  # Check if the first byte of the data set is in the range 0x00 to 0x7F.
-  if data[0] < 0x80:
-    return True
+    for num in data:
+        # Check utf-8 first Byte header
+        if remaining_byte == 0:
+            # Check One Byte
+            if num >> 7 == 0b0:
+                continue
+            # Check Two Byte
+            if num >> 5 == 0b110 or num >> 5 == 0b1110:
+                remaining_byte = 1
+            # Check Three Bytes
+            elif num >> 4 == 0b1110:
+                remaining_byte = 2
+            # Check Four Bytes
+            elif num >> 3 == 0b11110:
+                remaining_byte= 3
+            else:
+                return False
+       
+        else:
+           
+            if num >> 6 != 0b10:
+                return False
+            remaining_byte -= 1
 
-  # Check if the first byte of the data set is in the range 0xC2 to 0xDF.
-  elif data[0] >= 0xC2 and data[0] <= 0xDF:
-    return len(data) == 2 and data[1] < 0x80
-
-  # Check if the first byte of the data set is in the range 0xE0 to 0xEF.
-  elif data[0] >= 0xE0 and data[0] <= 0xEF:
-    return len(data) == 3 and (data[1] & 0xC0) == 0x80 and data[2] < 0x80
-
-  # Check if the first byte of the data set is in the range 0xF0 to 0xF7.
-  elif data[0] >= 0xF0 and data[0] <= 0xF7:
-    return len(data) == 4 and (data[1] & 0xC0) == 0x80 and (data[2] & 0xC0) == 0x80 and data[3] < 0x80
-
-  # Otherwise, the data set is not a valid UTF-8 encoding.
-  else:
-    return False
+    return remaining_byte == 0
