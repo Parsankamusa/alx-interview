@@ -32,14 +32,11 @@ def validUTF8(data):
                 remaining_byte = 2
             # Check Four Bytes
             elif num >> 3 == 0b11110:
-                remaining_byte= 3
+                remaining_byte = 3
             else:
                 return False
-       
         else:
-           
-            if num >> 6 != 0b10:
-                return False
-            remaining_byte -= 1
-
-    return remaining_byte == 0
+           if num >> 6 != 0b10:
+            return False
+        remaining_byte -= 1
+        return remaining_byte == 0
