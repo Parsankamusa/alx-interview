@@ -33,8 +33,6 @@ def nqueens(n, y, board):
             else:
                 print(board)
             del board[-1]
-
-
 def main():
     if len(sys.argv) != 2:
         print("Usage: nqueens N")
@@ -52,4 +50,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
