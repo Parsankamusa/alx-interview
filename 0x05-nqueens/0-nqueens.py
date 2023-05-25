@@ -2,7 +2,6 @@
 """Solving N Queens with Backtracing"""
 import sys
 
-
 def nqueens(n, y, board):
     """
     Method: nqueens - place n queens
