@@ -1,68 +1,24 @@
-#!/usr/bin/node
-const request = require('request');
+if (process.argv.length === 3) {
+  const myArgs = process.argv.slice(2);
+  const url = 'https://swapi-api.hbtn.io/api/films/' + myArgs[0];
+  const options = { json: true };
 
-function getCharacters(movieId) {
-  const filmUrl = `https://swapi.dev/api/films/${movieId}/`;
-  return new Promise((resolve, reject) => {
-    request(filmUrl, (error, response, body) => {
-      if (error) {
-        reject(error);
-      } else {
-        const filmData = JSON.parse(body);
-        const characterUrls = filmData.characters;
-        const characterNames = [];
-
-        function fetchCharacter(url) {
+  request(url, options, async function (error, res, body) {
+    if (error) {
+      console.log(error);
+    } else {
+      for (const char of body.characters) {
+        const ret = () => {
           return new Promise((resolve, reject) => {
-            request(url, (error, response, body) => {
-              if (error) {
-                reject(error);
-              } else {
-                const characterData = JSON.parse(body);
-                resolve(characterData.name);
+            request(char, options, function (error, res, body) {
+              if (error) { console.log(error); } else {
+                resolve(body.name);
               }
             });
           });
-        }
-
-        const characterPromises = characterUrls.map(fetchCharacter);
-        Promise.all(characterPromises)
-          .then((characters) => {
-            resolve(characters);
-          })
-          .catch((error) => {
-            reject(error);
-          });
+        };
+        console.log(await ret());
       }
-    });
-  });
-}
-
-function printCharacters(movieId) {
-  const movieTitleUrl = `https://swapi.dev/api/films/${movieId}/`;
-  request(movieTitleUrl, (error, response, body) => {
-    if (error) {
-      console.error(error);
-    } else {
-      const movieData = JSON.parse(body);
-      const movieTitle = movieData.title;
-
-      console.log(`Characters from ${movieTitle}:`);
-
-      getCharacters(movieId)
-        .then((characters) => {
-          characters.forEach((character) => {
-            console.log(character);
-          });
-        })
-        .catch((error) => {
-          console.error(error);
-        });
     }
   });
 }
-
-// Example usage
-const movieId = 3; // Return of the Jedi
-printCharacters(movieId);
-
