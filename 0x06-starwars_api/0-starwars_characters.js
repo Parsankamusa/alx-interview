@@ -1,3 +1,6 @@
+#!/usr/bin/node
+
+const request = require('request');
 if (process.argv.length === 3) {
   const myArgs = process.argv.slice(2);
   const url = 'https://swapi-api.hbtn.io/api/films/' + myArgs[0];
