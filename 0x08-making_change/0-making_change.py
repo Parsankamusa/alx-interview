@@ -1,38 +1,36 @@
 #!/usr/bin/python3
 """
-Defines function that determines the fewest number of coins to make change
+Change comes from within
 """
 
 
 def makeChange(coins, total):
     """
-    Determines the fewest number of coins needed to meet a given total
-
-    parameters:
-        coins [list or positive ints]:
-            the values of the coins in your possession
-            you can assume you have an infinite number of coins of all values
-        total [int]:
-            total amount of change to make
-            if total is 0 or less, return 0
-
-    returns:
-        the fewest number of coins to make the change
-        or -1 if the total change cannot be made with the given coins
+    determine the fewest number of coins
+    @coins: is a list of the values of the coins
+            in the possession
+    @total: given amount
+    Return:
+            fewest number of coins needed to meet total
+            *** If total is 0 or less, return 0
+            *** If total cannot be met by any number
+                of coins you have, return -1
     """
+    if (type(total) is not int or type(coins) is not list):
+        return -1
     if total <= 0:
         return 0
-    if len(coins) is 0:
+    try:
+        Min = [float('inf') for i in range(total+1)]
+        Min[0] = 0
+        for i in range(1, total+1):
+            for j in range(len(coins)):
+                if Min[i - coins[j]] + 1 < Min[i]:
+                    Min[i] = Min[i - coins[j]] + 1
+
+        if Min[total] != float('inf'):
+            return Min[total]
+        else:
+            return -1
+    except Exception:
         return -1
-    coins = sorted(coins)
-    dynamic = [float('inf')] * (total + 1)
-    dynamic[0] = 0
-    for i in range(total + 1):
-        for coin in coins:
-            if coin > i:
-                break
-            if dynamic[i - coin] != -1:
-                dynamic[i] = min(dynamic[i - coin] + 1, dynamic[i])
-    if dynamic[total] == float('inf'):
-        return -1
-    return dynamic[total]
